@@ -36,96 +36,6 @@
             transform: translateY(-2px);
         }
         
-        .meme-card {
-            background: linear-gradient(135deg, rgba(74, 0, 0, 0.8), rgba(26, 0, 0, 0.9));
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        
-        .meme-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(255, 215, 0, 0.4);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-        }
-        
-        .meme-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .meme-symbol {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .meme-change {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-        
-        .meme-change.positive {
-            background: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-        }
-        
-        .meme-change.negative {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-        }
-        
-        .meme-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        
-        .meme-stat {
-            background: rgba(255, 215, 0, 0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .meme-stat-label {
-            font-size: 0.75em;
-            color: #888;
-            margin-bottom: 4px;
-        }
-        
-        .meme-stat-value {
-            font-size: 0.95em;
-            color: #ffd700;
-            font-weight: 600;
-        }
-        
-        .meme-contract {
-            background: rgba(0,0,0,0.3);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8em;
-            color: #888;
-            word-break: break-all;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid transparent;
-        }
-        
-        .meme-contract:hover {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: rgba(255, 215, 0, 0.3);
-            color: #ffd700;
-        }
-        
         .loading-container {
             text-align: center;
             padding: 60px 20px;
@@ -176,22 +86,6 @@
             padding-top: 20px;
             border-top: 1px solid rgba(255, 215, 0, 0.1);
         }
-        
-        @media (max-width: 768px) {
-            .chain-selector {
-                flex-wrap: wrap;
-            }
-            
-            .meme-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .meme-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
     </style>
 </head>
 <body>
@@ -234,7 +128,7 @@
 
     <script>
         // API 配置 - Binance Web3 Meme Rush API
-        const API_BASE = 'https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list';
+        const API_URL = 'https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list';
         let currentChain = '56'; // 默认 BSC
         let currentCategory = 10; // 默认最新 (New)
         
@@ -288,44 +182,47 @@
             `;
             
             try {
-                // 调用 Binance Web3 Meme Rush API
-                const url = `${API_BASE}?chainId=${chainId}&rankType=${rankType}`;
-                
-                const response = await fetch(url, {
-                    method: 'GET',
+                // 调用 Binance Web3 Meme Rush API (POST 方式)
+                const response = await fetch(API_URL, {
+                    method: 'POST',
                     headers: {
-                        'Accept': 'application/json',
-                        'Accept-Language': 'zh-CN'
-                    }
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chainId: chainId,
+                        rankType: rankType,
+                        limit: 50
+                    })
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API请求失败: ${response.status}`);
+                    throw new Error(`API 请求失败：${response.status}`);
                 }
                 
                 const result = await response.json();
                 
                 if (result.code !== '000000') {
-                    throw new Error(result.message || 'API返回错误');
+                    throw new Error(result.message || 'API 返回错误');
                 }
                 
                 const data = result.data;
                 
-                if (!data.rank || data.rank.length === 0) {
+                if (!data || data.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
                             <h3>📭 暂无${categoryNames[rankType]}数据</h3>
-                            <p>该类目下暂时没有热点话题</p>
+                            <p>该类目下暂时没有 Meme 代币</p>
                         </div>
                     `;
                     return;
                 }
                 
-                renderMemeRush(data.rank, rankType);
+                renderMemeRush(data, rankType);
                 
                 // 更新最后更新时间
                 document.getElementById('last-update').textContent = 
-                    `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+                    `最后更新：${new Date().toLocaleString('zh-CN')}`;
                 
             } catch (error) {
                 console.error('加载 Meme Rush 数据失败:', error);
@@ -333,7 +230,7 @@
                     <div class="error-container">
                         <h3>⚠️ 数据加载失败</h3>
                         <p>${error.message}</p>
-                        <p>可能是网络问题或API暂时不可用</p>
+                        <p>可能是网络问题或 API 暂时不可用</p>
                         <button class="retry-btn" onclick="loadMemeRush('${chainId}', ${rankType})">🔄 重新加载</button>
                     </div>
                 `;
@@ -341,7 +238,7 @@
         }
         
         // 渲染 Meme Rush 数据
-        function renderMemeRush(topics, rankType) {
+        function renderMemeRush(tokens, rankType) {
             const container = document.getElementById('meme-container');
             const categoryNames = {
                 10: '🔥 最新',
@@ -349,70 +246,79 @@
                 30: '🚀 病毒'
             };
             
-            container.innerHTML = topics.map((topic, index) => {
-                const name = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知话题';
-                const netInflow = parseFloat(topic.topicNetInflow || 0);
-                const tokenCount = topic.tokenSize || 0;
-                const progress = parseFloat(topic.progress || 0);
+            container.innerHTML = tokens.map((token, index) => {
+                const symbol = token.symbol || 'Unknown';
+                const name = token.name || symbol;
+                const price = parseFloat(token.price || 0);
+                const priceChange = parseFloat(token.priceChange || 0);
+                const marketCap = parseFloat(token.marketCap || 0);
+                const liquidity = parseFloat(token.liquidity || 0);
+                const volume = parseFloat(token.volume || 0);
+                const holders = token.holders || 0;
+                const progress = parseFloat(token.progress || 0);
+                const contractAddress = token.contractAddress || '';
+                const protocol = token.protocol || 0;
+                const migrateStatus = token.migrateStatus || 0;
                 
-                // 获取前3个代币
-                const topTokens = (topic.tokenList || []).slice(0, 3);
+                // 协议名称
+                const protocolNames = {
+                    2001: 'Four.meme',
+                    2002: 'Flap',
+                    1001: 'Pump.fun',
+                    1010: 'Moonshot'
+                };
                 
                 return `
                     <div class="hotspot-card" style="animation-delay: ${index * 0.1}s">
                         <div class="hotspot-header">
                             <div class="hotspot-title">
                                 <span class="hotspot-icon">${categoryNames[rankType] || '🔥'}</span>
-                                <h3>${name}</h3>
+                                <h3>${symbol} ${name !== symbol ? `- ${name}` : ''}</h3>
                             </div>
                             <div class="hotspot-badges">
-                                <span class="badge badge-hot">${tokenCount} 代币</span>
-                                <span class="badge badge-update">💰 $${(netInflow/1000).toFixed(2)}K</span>
-                                <span class="badge" style="background: rgba(155, 89, 182, 0.2); color: #9b59b6; border-color: rgba(155, 89, 182, 0.3);">进度 ${progress.toFixed(1)}%</span>
+                                <span class="badge badge-hot">${protocolNames[protocol] || 'Unknown'}</span>
+                                <span class="badge badge-update">进度 ${progress.toFixed(2)}%</span>
+                                ${migrateStatus === 1 ? '<span class="badge" style="background: rgba(46, 204, 113, 0.2); color: #2ecc71; border-color: rgba(46, 204, 113, 0.3);">✅ 已迁移</span>' : ''}
                             </div>
                         </div>
                         
-                        ${topic.aiSummary?.aiSummaryCn ? `
-                            <div class="hotspot-summary">
-                                <p>🤖 ${topic.aiSummary.aiSummaryCn}</p>
+                        <div class="token-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                            <div class="token-stat">
+                                <div class="token-stat-label">市值</div>
+                                <div class="token-stat-value">$${(marketCap/1000).toFixed(2)}K</div>
                             </div>
-                        ` : ''}
-                        
-                        <div class="token-list">
-                            <h4>🏷️ 关联代币 (${topTokens.length})</h4>
-                            ${topTokens.length > 0 ? topTokens.map(token => `
-                                <div class="token-item">
-                                    <div class="token-info">
-                                        <span class="token-symbol">${token.symbol}</span>
-                                        <span class="token-price">市值: $${parseFloat(token.marketCap || 0).toFixed(2)}</span>
-                                        <span class="token-contract" title="点击复制合约地址">📋 ${token.contractAddress}</span>
-                                    </div>
-                                    <div class="token-stats">
-                                        <span class="token-change ${parseFloat(token.priceChange24h || 0) >= 0 ? 'positive' : 'negative'}">
-                                            ${parseFloat(token.priceChange24h || 0) >= 0 ? '+' : ''}${parseFloat(token.priceChange24h || 0).toFixed(2)}%
-                                        </span>
-                                        <span class="token-holders">👥 ${token.holders || 0}</span>
-                                    </div>
+                            <div class="token-stat">
+                                <div class="token-stat-label">流动性</div>
+                                <div class="token-stat-value">$${(liquidity/1000).toFixed(2)}K</div>
+                            </div>
+                            <div class="token-stat">
+                                <div class="token-stat-label">24h 成交量</div>
+                                <div class="token-stat-value">$${(volume/1000).toFixed(2)}K</div>
+                            </div>
+                            <div class="token-stat">
+                                <div class="token-stat-label">持有者</div>
+                                <div class="token-stat-value">👥 ${holders}</div>
+                            </div>
+                            <div class="token-stat">
+                                <div class="token-stat-label">24h 涨跌</div>
+                                <div class="token-stat-value" style="color: ${priceChange >= 0 ? '#2ecc71' : '#e74c3c'}">
+                                    ${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%
                                 </div>
-                            `).join('') : '<p class="no-tokens">暂无代币数据</p>'}
+                            </div>
                         </div>
                         
-                        ${topic.topicLink ? `
-                            <div class="hotspot-footer">
-                                <a href="${topic.topicLink}" target="_blank" class="topic-link">
-                                    🔗 查看原文 <span class="arrow">→</span>
-                                </a>
-                            </div>
-                        ` : ''}
+                        <div class="meme-contract" title="点击复制合约地址">
+                            📋 合约地址：${contractAddress}
+                        </div>
                     </div>
                 `;
             }).join('');
             
             // 添加点击复制合约地址功能
-            document.querySelectorAll('.token-contract').forEach(el => {
+            document.querySelectorAll('.meme-contract').forEach(el => {
                 el.style.cursor = 'pointer';
                 el.addEventListener('click', function() {
-                    const address = this.textContent.replace('📋 ', '');
+                    const address = this.textContent.replace('📋 合约地址：', '');
                     navigator.clipboard.writeText(address).then(() => {
                         const original = this.textContent;
                         this.textContent = '✅ 已复制!';
