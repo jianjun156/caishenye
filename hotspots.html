@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔥 热点话题 - 财神爷养成日记</title>
@@ -50,7 +53,7 @@
         // 加载热点数据
         async function loadHotspots() {
             try {
-                const response = await fetch('./alerts-data.json');
+                const response = await fetch('./alerts-data.json?v=' + Date.now());
                 if (!response.ok) throw new Error('数据加载失败');
                 
                 const data = await response.json();
