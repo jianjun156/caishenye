@@ -1,44 +1,127 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 热点话题监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 热点话题 - 财神爷养成日记</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .category-tab {
+            padding: 12px 24px;
+            background: rgba(139, 0, 0, 0.6);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 25px;
+            color: #ffaa00;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .category-tab:hover,
+        .category-tab.active {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.3));
+            border-color: #ffd700;
+            color: #ffd700;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .loading-spinner-large {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 215, 0, 0.2);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .token-contract {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            color: #888;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+        
+        .error-container {
+            text-align: center;
+            padding: 60px 20px;
+            color: #e74c3c;
+        }
+        
+        .retry-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: none;
+            border-radius: 25px;
+            color: #1a0000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .last-update {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div class="mascot">🔥</div>
-            <h1>热点话题监控</h1>
-            <p class="subtitle">实时监控 Topic Rush 热点，捕捉金狗机会</p>
-            <span class="status">🟢 持续监控中</span>
+            <h1>热点话题实时监控</h1>
+            <p class="subtitle">动态调用 OKX Topic Rush API，捕捉最新土狗机会</p>
+            <span class="status">🟢 实时监控中</span>
         </header>
 
-        <div class="stats">
-            <div class="stat-card">
-                <h3 id="total-alerts">--</h3>
-                <p>🔥 热点发现</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="total-tokens">--</h3>
-                <p>🐕 关联代币</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="last-update">--</h3>
-                <p>⏱️ 最后更新</p>
-            </div>
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="10">🔥 最新 (Latest)</button>
+            <button class="category-tab" data-category="20">📈 上升 (Rising)</button>
+            <button class="category-tab" data-category="30">🚀 病毒 (Viral)</button>
         </div>
 
-        <div class="hotspots-section" id="hotspots-container">
-            <div class="loading">
-                <div class="loading-spinner"></div>
+        <div id="hotspots-container">
+            <div class="loading-container">
+                <div class="loading-spinner-large"></div>
                 <p>正在加载热点数据...</p>
             </div>
         </div>
+
+        <div class="last-update" id="last-update"></div>
 
         <footer>
             <p>🚀 财神爷 | 职业 Meme 土狗交易专家 | 随时准备捕捉下一个 100x</p>
@@ -50,57 +133,110 @@
     </div>
 
     <script>
+        // API 配置
+        const API_BASE = 'https://www.okx.com';
+        const CHAIN_ID = '56'; // BSC
+        
+        let currentCategory = 10; // 默认最新
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHotspots(currentCategory);
+            setupCategoryTabs();
+        });
+        
+        // 设置分类标签切换
+        function setupCategoryTabs() {
+            const tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // 添加active到当前
+                    tab.classList.add('active');
+                    // 获取category
+                    currentCategory = parseInt(tab.dataset.category);
+                    // 重新加载数据
+                    loadHotspots(currentCategory);
+                });
+            });
+        }
+        
         // 加载热点数据
-        async function loadHotspots() {
+        async function loadHotspots(rankType) {
+            const container = document.getElementById('hotspots-container');
+            container.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner-large"></div>
+                    <p>正在加载热点数据...</p>
+                </div>
+            `;
+            
             try {
-                const response = await fetch('./alerts-data.json?v=' + Date.now());
-                if (!response.ok) throw new Error('数据加载失败');
+                // 调用 OKX API
+                const url = `${API_BASE}/api/v5/dex/token/rank/topic-rush?chainId=${CHAIN_ID}&rankType=${rankType}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 
-                const data = await response.json();
-                renderHotspots(data);
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.code !== '0' || !result.data) {
+                    throw new Error('API返回数据异常');
+                }
+                
+                // 渲染数据
+                renderHotspots(result.data, rankType);
+                
+                // 更新最后更新时间
+                document.getElementById('last-update').textContent = 
+                    `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+                
             } catch (error) {
                 console.error('加载热点数据失败:', error);
-                document.getElementById('hotspots-container').innerHTML = `
-                    <div class="error-state">
+                container.innerHTML = `
+                    <div class="error-container">
                         <h3>⚠️ 数据加载失败</h3>
-                        <p>请稍后刷新重试</p>
+                        <p>${error.message}</p>
+                        <p>可能是网络问题或API暂时不可用</p>
+                        <button class="retry-btn" onclick="loadHotspots(${rankType})">🔄 重新加载</button>
                     </div>
                 `;
             }
         }
-
+        
         // 渲染热点列表
-        function renderHotspots(data) {
+        function renderHotspots(data, rankType) {
             const container = document.getElementById('hotspots-container');
             
-            // 更新统计数据
-            document.getElementById('total-alerts').textContent = data.totalAlerts || 0;
-            
-            let totalTokens = 0;
-            data.alerts.forEach(alert => {
-                totalTokens += alert.topic.tokenSize || 0;
-            });
-            document.getElementById('total-tokens').textContent = totalTokens;
-            
-            const lastUpdate = new Date(data.lastUpdate);
-            document.getElementById('last-update').textContent = lastUpdate.toLocaleString('zh-CN');
-            
-            // 渲染热点卡片
-            if (!data.alerts || data.alerts.length === 0) {
+            if (!data.rank || data.rank.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <h3>📭 暂无热点数据</h3>
-                        <p>监控持续进行中，有新热点时会自动更新</p>
+                        <p>该类目下暂时没有热点话题</p>
                     </div>
                 `;
                 return;
             }
             
-            container.innerHTML = data.alerts.map((alert, index) => {
-                const topic = alert.topic;
+            const categoryNames = {
+                10: '🔥 最新',
+                20: '📈 上升', 
+                30: '🚀 病毒'
+            };
+            
+            container.innerHTML = data.rank.map((topic, index) => {
                 const name = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知话题';
                 const netInflow = parseFloat(topic.topicNetInflow || 0);
                 const tokenCount = topic.tokenSize || 0;
+                const progress = parseFloat(topic.progress || 0);
                 
                 // 获取前3个代币
                 const topTokens = (topic.tokenList || []).slice(0, 3);
@@ -109,12 +245,13 @@
                     <div class="hotspot-card" style="animation-delay: ${index * 0.1}s">
                         <div class="hotspot-header">
                             <div class="hotspot-title">
-                                <span class="hotspot-icon">🔥</span>
+                                <span class="hotspot-icon">${categoryNames[rankType]}</span>
                                 <h3>${name}</h3>
                             </div>
                             <div class="hotspot-badges">
                                 <span class="badge badge-hot">${tokenCount} 代币</span>
                                 <span class="badge badge-update">💰 $${(netInflow/1000).toFixed(2)}K</span>
+                                <span class="badge" style="background: rgba(155, 89, 182, 0.2); color: #9b59b6; border-color: rgba(155, 89, 182, 0.3);">进度 ${progress.toFixed(1)}%</span>
                             </div>
                         </div>
                         
@@ -125,12 +262,13 @@
                         ` : ''}
                         
                         <div class="token-list">
-                            <h4>🏷️ 关联代币</h4>
+                            <h4>🏷️ 关联代币 (${topTokens.length})</h4>
                             ${topTokens.length > 0 ? topTokens.map(token => `
                                 <div class="token-item">
                                     <div class="token-info">
                                         <span class="token-symbol">${token.symbol}</span>
-                                        <span class="token-price">$${parseFloat(token.marketCap || 0).toFixed(2)}</span>
+                                        <span class="token-price">市值: $${parseFloat(token.marketCap || 0).toFixed(2)}</span>
+                                        <span class="token-contract" title="点击复制">📋 ${token.contractAddress}</span>
                                     </div>
                                     <div class="token-stats">
                                         <span class="token-change ${parseFloat(token.priceChange24h || 0) >= 0 ? 'positive' : 'negative'}">
@@ -152,10 +290,22 @@
                     </div>
                 `;
             }).join('');
+            
+            // 添加点击复制合约地址功能
+            document.querySelectorAll('.token-contract').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', function() {
+                    const address = this.textContent.replace('📋 ', '');
+                    navigator.clipboard.writeText(address).then(() => {
+                        const original = this.textContent;
+                        this.textContent = '✅ 已复制!';
+                        setTimeout(() => {
+                            this.textContent = original;
+                        }, 1500);
+                    });
+                });
+            });
         }
-
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', loadHotspots);
     </script>
 </body>
 </html>
