@@ -1,0 +1,137 @@
+name: Meme Rush Data Fetcher
+
+on:
+  schedule:
+    # 每 15 分钟执行一次
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Fetch Meme Rush Data
+        run: |
+          node << 'EOF'
+          const https = require('https');
+          const fs = require('fs');
+          
+          const API_URL = 'https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list';
+          
+          const categories = {
+            'latest': 10,
+            'rising': 20,
+            'migrated': 30
+          };
+          
+          const chains = {
+            'bsc': '56',
+            'solana': 'CT_501'
+          };
+          
+          async function fetchData(chainId, rankType) {
+            return new Promise((resolve, reject) => {
+              const postData = JSON.stringify({
+                chainId: chainId,
+                rankType: rankType,
+                limit: 50
+              });
+              
+              const options = {
+                hostname: 'web3.binance.com',
+                port: 443,
+                path: '/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list',
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': Buffer.byteLength(postData),
+                  'Accept': 'application/json'
+                }
+              };
+              
+              const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', (chunk) => data += chunk);
+                res.on('end', () => {
+                  try {
+                    const result = JSON.parse(data);
+                    resolve(result.data || []);
+                  } catch (e) {
+                    reject(e);
+                  }
+                });
+              });
+              
+              req.on('error', reject);
+              req.write(postData);
+              req.end();
+            });
+          }
+          
+          async function main() {
+            const allData = {};
+            
+            for (const [chainName, chainId] of Object.entries(chains)) {
+              allData[chainName] = {};
+              for (const [categoryName, rankType] of Object.entries(categories)) {
+                console.log(`Fetching ${chainName} - ${categoryName}...`);
+                try {
+                  const data = await fetchData(chainId, rankType);
+                  allData[chainName][categoryName] = {
+                    data: data,
+                    count: data.length,
+                    timestamp: new Date().toISOString()
+                  };
+                  console.log(`  ✅ Got ${data.length} tokens`);
+                } catch (error) {
+                  console.error(`  ❌ Error: ${error.message}`);
+                  allData[chainName][categoryName] = {
+                    data: [],
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                  };
+                }
+              }
+            }
+            
+            // 保存数据
+            fs.writeFileSync('meme-rush-data.json', JSON.stringify(allData, null, 2));
+            console.log('\n✅ Data saved to meme-rush-data.json');
+            
+            // 输出摘要
+            const summary = {
+              timestamp: new Date().toISOString(),
+              chains: {},
+              total: 0
+            };
+            
+            for (const [chainName, categories] of Object.entries(allData)) {
+              summary.chains[chainName] = {};
+              for (const [catName, catData] of Object.entries(categories)) {
+                summary.chains[chainName][catName] = catData.count || 0;
+                summary.total += catData.count || 0;
+              }
+            }
+            
+            console.log('\n📊 Summary:');
+            console.log(JSON.stringify(summary, null, 2));
+          }
+          
+          main().catch(console.error);
+          EOF
+      
+      - name: Commit and Push Data
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add meme-rush-data.json
+          git diff --staged --quiet || git commit -m "📊 Auto-update Meme Rush data $(date '+%Y-%m-%d %H:%M')"
+          git push
