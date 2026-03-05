@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 Meme Rush 热点监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="style.css?v=202603051700">
+    <link rel="stylesheet" href="style.css?v=202603051705">
     <style>
         .chain-selector, .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
         .chain-btn, .category-tab {
@@ -74,7 +74,7 @@
         <header>
             <div class="mascot">🚀</div>
             <h1>Meme Rush 热点监控</h1>
-            <p class="subtitle">Binance Web3 Meme Rush API - CORS 代理模式</p>
+            <p class="subtitle">Binance Web3 Meme Rush API</p>
             <span class="status">🟢 实时监控中</span>
         </header>
 
@@ -103,9 +103,9 @@
     </div>
 
     <script>
-        // 使用 CORS 代理解决跨域问题
-        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-        const API_URL = 'https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list';
+        // 使用 corsproxy.io 解决 CORS 跨域问题
+        const CORS_PROXY = 'https://corsproxy.io/?';
+        const API_URL = encodeURIComponent('https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list');
         
         let currentChain = '56';
         let currentCategory = 10;
@@ -145,43 +145,29 @@
             container.innerHTML = '<div class="loading-container"><p>🔄 正在加载 ' + categoryNames[rankType] + ' 数据...</p></div>';
             
             try {
-                // 使用 CORS 代理
                 const postData = JSON.stringify({
                     chainId: chainId,
                     rankType: rankType,
                     limit: 50
                 });
                 
-                // 使用 allorigins.win 代理 POST 请求
-                const proxyUrl = 'https://api.allorigins.win/post?url=' + encodeURIComponent(API_URL);
+                // 使用 corsproxy.io 代理
+                const proxyUrl = CORS_PROXY + API_URL;
                 
                 const response = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        url: API_URL,
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: postData
-                    })
+                    body: postData
                 });
                 
                 if (!response.ok) {
-                    throw new Error('代理请求失败：' + response.status);
+                    throw new Error('请求失败：' + response.status);
                 }
                 
-                const proxyResult = await response.json();
-                
-                if (!proxyResult.contents) {
-                    throw new Error('代理返回空数据');
-                }
-                
-                const result = JSON.parse(proxyResult.contents);
+                const result = await response.json();
                 
                 if (result.code !== '000000') {
                     throw new Error(result.message || 'API 错误：' + result.code);
