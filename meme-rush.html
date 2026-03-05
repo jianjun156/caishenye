@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 Meme Rush 热点监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="style.css?v=202603051715">
+    <link rel="stylesheet" href="style.css?v=202603051745">
     <style>
         .chain-selector, .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
         .chain-btn, .category-tab {
@@ -41,29 +41,82 @@
             padding: 20px;
             margin-bottom: 15px;
         }
+        .hotspot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .hotspot-title h3 {
+            color: #ffd700;
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+        .hotspot-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .hotspot-summary {
+            background: rgba(255, 215, 0, 0.05);
+            border-left: 3px solid #ffd700;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+        .hotspot-summary p {
+            color: #ffaa00;
+            margin: 0;
+            line-height: 1.6;
+            font-size: 0.9em;
+        }
+        .token-list h4 {
+            color: #ffd700;
+            margin: 15px 0 10px;
+            font-size: 1em;
+        }
+        .token-item {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .token-symbol {
+            color: #ffd700;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
         .token-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
         }
         .token-stat {
-            background: rgba(255, 215, 0, 0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-align: center;
+            font-size: 0.8em;
+            color: #888;
         }
-        .token-stat-label { font-size: 0.75em; color: #888; }
-        .token-stat-value { font-size: 0.95em; color: #ffd700; font-weight: 600; }
+        .token-stat-value {
+            color: #ffd700;
+            font-weight: 600;
+            margin-top: 2px;
+        }
         .meme-contract {
             background: rgba(0,0,0,0.3);
-            padding: 10px 12px;
+            padding: 8px 12px;
             border-radius: 8px;
             font-family: monospace;
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: #888;
             cursor: pointer;
             word-break: break-all;
+            margin-top: 8px;
         }
         .meme-contract:hover { background: rgba(255, 215, 0, 0.1); color: #ffd700; }
         .last-update { text-align: center; color: #888; margin-top: 30px; }
@@ -84,13 +137,11 @@
         <header>
             <div class="mascot">🚀</div>
             <h1>Meme Rush 热点监控</h1>
-            <p class="subtitle">GitHub Actions 定时抓取 · 每 15 分钟更新</p>
-            <span class="status">🟢 数据已更新</span>
+            <p class="subtitle">Binance Web3 Topic Rush - 热点话题追踪</p>
+            <span class="status">🟢 实时监控中</span>
         </header>
 
-        <div class="data-info" id="data-info">
-            📊 加载中...
-        </div>
+        <div class="data-info" id="data-info">📊 加载中...</div>
 
         <div class="chain-selector">
             <button class="chain-btn active" data-chain="bsc">🟡 BSC</button>
@@ -100,7 +151,7 @@
         <div class="category-tabs">
             <button class="category-tab active" data-category="latest">🔥 最新</button>
             <button class="category-tab" data-category="rising">📈 上升</button>
-            <button class="category-tab" data-category="migrated">🚀 病毒</button>
+            <button class="category-tab" data-category="viral">🚀 病毒</button>
         </div>
 
         <div id="meme-container">
@@ -128,15 +179,12 @@
             renderMemeRush();
         });
         
-        // 加载数据 - 从 GitHub 仓库读取
         async function loadMemeData() {
             try {
-                // 从 GitHub raw 文件读取（绕过 Pages 限制）
                 const githubUrl = 'https://raw.githubusercontent.com/jianjun156/caishenye/main/meme-rush-data.json';
                 const response = await fetch(githubUrl + '?t=' + Date.now());
                 if (!response.ok) throw new Error('数据文件不存在');
                 memeData = await response.json();
-                
                 updateDataInfo();
             } catch (error) {
                 console.error('加载数据失败:', error);
@@ -144,14 +192,12 @@
                     <div class="error-container">
                         <h3>⚠️ 数据加载失败</h3>
                         <p>${error.message}</p>
-                        <p>可能是第一次运行，等待 GitHub Actions 抓取数据</p>
                         <button class="retry-btn" onclick="location.reload()">🔄 刷新</button>
                     </div>
                 `;
             }
         }
         
-        // 更新数据信息
         function updateDataInfo() {
             const chainData = memeData[currentChain];
             if (!chainData) return;
@@ -160,7 +206,7 @@
             const timestamp = chainData.latest?.timestamp || '';
             
             document.getElementById('data-info').textContent = 
-                `📊 共 ${total} 个代币 | 最后更新：${new Date(timestamp).toLocaleString('zh-CN')}`;
+                `📊 共 ${total} 个热点话题 | 最后更新：${new Date(timestamp).toLocaleString('zh-CN')}`;
             
             document.getElementById('last-update').textContent = 
                 `数据更新时间：${new Date(timestamp).toLocaleString('zh-CN')} (每 15 分钟自动更新)`;
@@ -191,8 +237,7 @@
         
         function renderMemeRush() {
             const container = document.getElementById('meme-container');
-            const categoryNames = {latest: '🔥 最新', rising: '📈 上升', migrated: '🚀 病毒'};
-            const protocolNames = {2001: 'Four.meme', 2002: 'Flap', 1001: 'Pump.fun', 1010: 'Moonshot'};
+            const categoryNames = {latest: '🔥 最新', rising: '📈 上升', viral: '🚀 病毒'};
             
             const chainData = memeData[currentChain];
             if (!chainData) {
@@ -201,48 +246,85 @@
             }
             
             const categoryData = chainData[currentCategory];
-            const tokens = categoryData?.data || [];
+            const topics = categoryData?.data || [];
             
-            if (!tokens || tokens.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>📭 暂无数据</h3><p>该类目下暂时没有 Meme 代币</p></div>';
+            if (!topics || topics.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>📭 暂无数据</h3><p>该类目下暂时没有热点话题</p></div>';
                 return;
             }
             
-            container.innerHTML = tokens.map((token, i) => `
-                <div class="hotspot-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                        <h3 style="color:#ffd700;margin:0;">${categoryNames[currentCategory]} - ${token.symbol || 'Unknown'}</h3>
-                        <span style="background:rgba(255,215,0,0.2);padding:5px 12px;border-radius:15px;color:#ffaa00;">
-                            ${protocolNames[token.protocol] || 'Unknown'}
-                        </span>
+            container.innerHTML = topics.map((topic, i) => {
+                const name = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知话题';
+                const netInflow = parseFloat(topic.topicNetInflow || 0);
+                const tokenCount = topic.tokenSize || 0;
+                const progress = parseFloat(topic.progress || 0);
+                const type = topic.type || 'Unknown';
+                const tokens = topic.tokenList || [];
+                
+                return `
+                    <div class="hotspot-card">
+                        <div class="hotspot-header">
+                            <div class="hotspot-title">
+                                <h3>${name}</h3>
+                                <div style="color:#888;font-size:0.85em;margin-top:5px;">📊 类型：${type}</div>
+                            </div>
+                            <div class="hotspot-badges">
+                                <span class="badge">🔥 ${tokenCount} 代币</span>
+                                <span class="badge">💰 $${(netInflow/1000).toFixed(2)}K</span>
+                                <span class="badge">📈 进度 ${progress.toFixed(1)}%</span>
+                            </div>
+                        </div>
+                        
+                        ${topic.aiSummary?.aiSummaryCn ? `
+                            <div class="hotspot-summary">
+                                <p>🤖 ${topic.aiSummary.aiSummaryCn}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${tokens.length > 0 ? `
+                            <div class="token-list">
+                                <h4>🏷️ 关联代币 (${tokens.length})</h4>
+                                ${tokens.slice(0, 5).map(token => `
+                                    <div class="token-item">
+                                        <div class="token-symbol">${token.symbol}</div>
+                                        <div class="token-stats">
+                                            <div class="token-stat">
+                                                <div>市值</div>
+                                                <div class="token-stat-value">$${(parseFloat(token.marketCap||0)/1000).toFixed(2)}K</div>
+                                            </div>
+                                            <div class="token-stat">
+                                                <div>流动性</div>
+                                                <div class="token-stat-value">$${(parseFloat(token.liquidity||0)/1000).toFixed(2)}K</div>
+                                            </div>
+                                            <div class="token-stat">
+                                                <div>24h 涨跌</div>
+                                                <div class="token-stat-value" style="color: ${parseFloat(token.priceChange24h||0) >= 0 ? '#2ecc71' : '#e74c3c'}">
+                                                    ${parseFloat(token.priceChange24h||0) >= 0 ? '+' : ''}${parseFloat(token.priceChange24h||0).toFixed(2)}%
+                                                </div>
+                                            </div>
+                                            <div class="token-stat">
+                                                <div>持有者</div>
+                                                <div class="token-stat-value">👥 ${token.holders||0}</div>
+                                            </div>
+                                        </div>
+                                        <div class="meme-contract" onclick="navigator.clipboard.writeText('${token.contractAddress}');this.textContent='✅ 已复制!';setTimeout(()=>this.textContent='📋 '+this.dataset.addr,1500);" data-addr="${token.contractAddress}">
+                                            📋 ${token.contractAddress}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${topic.topicLink ? `
+                            <div style="margin-top:15px;">
+                                <a href="${topic.topicLink}" target="_blank" style="color:#ffd700;text-decoration:none;font-size:0.9em;">
+                                    🔗 查看原文 →
+                                </a>
+                            </div>
+                        ` : ''}
                     </div>
-                    <div class="token-stats">
-                        <div class="token-stat">
-                            <div class="token-stat-label">市值</div>
-                            <div class="token-stat-value">$${(parseFloat(token.marketCap||0)/1000).toFixed(2)}K</div>
-                        </div>
-                        <div class="token-stat">
-                            <div class="token-stat-label">流动性</div>
-                            <div class="token-stat-value">$${(parseFloat(token.liquidity||0)/1000).toFixed(2)}K</div>
-                        </div>
-                        <div class="token-stat">
-                            <div class="token-stat-label">成交量</div>
-                            <div class="token-stat-value">$${(parseFloat(token.volume||0)/1000).toFixed(2)}K</div>
-                        </div>
-                        <div class="token-stat">
-                            <div class="token-stat-label">持有者</div>
-                            <div class="token-stat-value">👥 ${token.holders||0}</div>
-                        </div>
-                        <div class="token-stat">
-                            <div class="token-stat-label">进度</div>
-                            <div class="token-stat-value">${(parseFloat(token.progress||0)).toFixed(2)}%</div>
-                        </div>
-                    </div>
-                    <div class="meme-contract" onclick="navigator.clipboard.writeText('${token.contractAddress}');this.textContent='✅ 已复制!';setTimeout(()=>this.textContent='📋 '+this.dataset.addr,1500);" data-addr="${token.contractAddress}">
-                        📋 ${token.contractAddress}
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
     </script>
 </body>
