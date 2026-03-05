@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 热点话题 - 财神爷养成日记</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="mascot">🔥</div>
+            <h1>热点话题监控</h1>
+            <p class="subtitle">实时监控 Topic Rush 热点，捕捉金狗机会</p>
+            <span class="status">🟢 持续监控中</span>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="total-alerts">--</h3>
+                <p>🔥 热点发现</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="total-tokens">--</h3>
+                <p>🐕 关联代币</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="last-update">--</h3>
+                <p>⏱️ 最后更新</p>
+            </div>
+        </div>
+
+        <div class="hotspots-section" id="hotspots-container">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>正在加载热点数据...</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>🚀 财神爷 | 职业 Meme 土狗交易专家 | 随时准备捕捉下一个 100x</p>
+            <p>
+                <a href="index.html">🏠 返回首页</a> |
+                <a href="https://github.com/jianjun156/caishenye" target="_blank">📁 GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // 加载热点数据
+        async function loadHotspots() {
+            try {
+                const response = await fetch('./alerts-data.json');
+                if (!response.ok) throw new Error('数据加载失败');
+                
+                const data = await response.json();
+                renderHotspots(data);
+            } catch (error) {
+                console.error('加载热点数据失败:', error);
+                document.getElementById('hotspots-container').innerHTML = `
+                    <div class="error-state">
+                        <h3>⚠️ 数据加载失败</h3>
+                        <p>请稍后刷新重试</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 渲染热点列表
+        function renderHotspots(data) {
+            const container = document.getElementById('hotspots-container');
+            
+            // 更新统计数据
+            document.getElementById('total-alerts').textContent = data.totalAlerts || 0;
+            
+            let totalTokens = 0;
+            data.alerts.forEach(alert => {
+                totalTokens += alert.topic.tokenSize || 0;
+            });
+            document.getElementById('total-tokens').textContent = totalTokens;
+            
+            const lastUpdate = new Date(data.lastUpdate);
+            document.getElementById('last-update').textContent = lastUpdate.toLocaleString('zh-CN');
+            
+            // 渲染热点卡片
+            if (!data.alerts || data.alerts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 暂无热点数据</h3>
+                        <p>监控持续进行中，有新热点时会自动更新</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = data.alerts.map((alert, index) => {
+                const topic = alert.topic;
+                const name = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知话题';
+                const netInflow = parseFloat(topic.topicNetInflow || 0);
+                const tokenCount = topic.tokenSize || 0;
+                
+                // 获取前3个代币
+                const topTokens = (topic.tokenList || []).slice(0, 3);
+                
+                return `
+                    <div class="hotspot-card" style="animation-delay: ${index * 0.1}s">
+                        <div class="hotspot-header">
+                            <div class="hotspot-title">
+                                <span class="hotspot-icon">🔥</span>
+                                <h3>${name}</h3>
+                            </div>
+                            <div class="hotspot-badges">
+                                <span class="badge badge-hot">${tokenCount} 代币</span>
+                                <span class="badge badge-update">💰 $${(netInflow/1000).toFixed(2)}K</span>
+                            </div>
+                        </div>
+                        
+                        ${topic.aiSummary?.aiSummaryCn ? `
+                            <div class="hotspot-summary">
+                                <p>🤖 ${topic.aiSummary.aiSummaryCn}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="token-list">
+                            <h4>🏷️ 关联代币</h4>
+                            ${topTokens.length > 0 ? topTokens.map(token => `
+                                <div class="token-item">
+                                    <div class="token-info">
+                                        <span class="token-symbol">${token.symbol}</span>
+                                        <span class="token-price">$${parseFloat(token.marketCap || 0).toFixed(2)}</span>
+                                    </div>
+                                    <div class="token-stats">
+                                        <span class="token-change ${parseFloat(token.priceChange24h || 0) >= 0 ? 'positive' : 'negative'}">
+                                            ${parseFloat(token.priceChange24h || 0) >= 0 ? '+' : ''}${parseFloat(token.priceChange24h || 0).toFixed(2)}%
+                                        </span>
+                                        <span class="token-holders">👥 ${token.holders || 0}</span>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="no-tokens">暂无代币数据</p>'}
+                        </div>
+                        
+                        ${topic.topicLink ? `
+                            <div class="hotspot-footer">
+                                <a href="${topic.topicLink}" target="_blank" class="topic-link">
+                                    🔗 查看原文 <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', loadHotspots);
+    </script>
+</body>
+</html>

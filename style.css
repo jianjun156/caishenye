@@ -1,0 +1,375 @@
+/* 财神爷养成日记 - 全局样式 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a0000 0%, #4a0000 30%, #8b0000 70%, #4a0000 100%);
+    min-height: 100vh;
+    color: #ffd700;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 金元宝飘落动画背景 */
+.coins {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.coin {
+    position: absolute;
+    font-size: 20px;
+    animation: fall linear infinite;
+    opacity: 0.6;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 容器 */
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: 60px 20px 40px;
+}
+
+.mascot {
+    font-size: 6em;
+    margin-bottom: 20px;
+    animation: bounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.05); }
+}
+
+header h1 {
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700, #ff8c00);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shine 3s linear infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+@keyframes shine {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+.subtitle {
+    font-size: 1.2em;
+    color: #ffaa00;
+    margin-bottom: 10px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.status {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    color: #ffd700;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.95em;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+/* 统计数据 */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 50px 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.6), rgba(74, 0, 0, 0.8));
+    backdrop-filter: blur(10px);
+    padding: 30px 20px;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.6);
+}
+
+.stat-card h3 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #ffd700, #ffed4e, #ff8c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+}
+
+.stat-card p {
+    color: #ffaa00;
+    font-size: 1em;
+    font-weight: 500;
+}
+
+/* 热点话题卡片 */
+.hotspot-card {
+    background: linear-gradient(135deg, rgba(74, 0, 0, 0.8), rgba(26, 0, 0, 0.9));
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.hotspot-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+}
+
+.hotspot-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255, 215, 0, 0.1);
+}
+
+.hotspot-card:hover::before {
+    transform: scaleX(1);
+}
+
+.hotspot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.hotspot-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hotspot-icon {
+    font-size: 1.5em;
+}
+
+.hotspot-title h3 {
+    font-size: 1.3em;
+    color: #ffd700;
+    margin: 0;
+}
+
+.hotspot-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.badge-hot {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.badge-update {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.hotspot-summary {
+    background: rgba(255, 215, 0, 0.05);
+    border-left: 3px solid #ffd700;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 0 8px 8px 0;
+}
+
+.hotspot-summary p {
+    color: #ffaa00;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.token-list {
+    margin-top: 15px;
+}
+
+.token-list h4 {
+    color: #ffd700;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+.token-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 215, 0, 0.05);
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.token-item:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.token-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.token-symbol {
+    color: #ffd700;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.token-price {
+    color: #ffaa00;
+    font-size: 0.9em;
+}
+
+.token-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.token-change {
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85em;
+}
+
+.token-change.positive {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+
+.token-change.negative {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.token-holders {
+    color: #ffaa00;
+    font-size: 0.9em;
+}
+
+.no-tokens {
+    color: #888;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+.hotspot-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.topic-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #ffd700;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: all 0.3s;
+}
+
+.topic-link:hover {
+    color: #ffed4e;
+    gap: 10px;
+}
+
+.arrow {
+    transition: transform 0.3s;
+}
+
+.topic-link:hover .arrow {
+    transform: translateX(5px);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .hotspot-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .token-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .token-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
