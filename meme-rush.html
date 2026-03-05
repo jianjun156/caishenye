@@ -128,10 +128,12 @@
             renderMemeRush();
         });
         
-        // 加载数据
+        // 加载数据 - 从 GitHub 仓库读取
         async function loadMemeData() {
             try {
-                const response = await fetch('./meme-rush-data.json?t=' + Date.now());
+                // 从 GitHub raw 文件读取（绕过 Pages 限制）
+                const githubUrl = 'https://raw.githubusercontent.com/jianjun156/caishenye/main/meme-rush-data.json';
+                const response = await fetch(githubUrl + '?t=' + Date.now());
                 if (!response.ok) throw new Error('数据文件不存在');
                 memeData = await response.json();
                 
