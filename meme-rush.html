@@ -5,130 +5,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 Meme Rush 热点监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="style.css?v=202603051745">
+    <link rel="stylesheet" href="style.css?v=202603051750">
     <style>
-        .chain-selector, .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a0000 0%, #4a0000 50%, #2a0000 100%);
+            min-height: 100vh;
+            color: #ffd700;
+            padding: 10px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        header {
+            text-align: center;
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+        .mascot { font-size: 3em; margin-bottom: 5px; }
+        header h1 { font-size: 1.8em; margin-bottom: 5px; }
+        .subtitle { font-size: 0.9em; color: #ffaa00; }
+        .status {
+            display: inline-block;
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        
+        .data-info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 8px 15px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ffaa00;
+            font-size: 0.85em;
+        }
+        
+        .chain-selector, .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
         .chain-btn, .category-tab {
-            padding: 10px 20px;
+            padding: 6px 15px;
             background: rgba(139, 0, 0, 0.6);
             border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 20px;
+            border-radius: 15px;
             color: #ffaa00;
             cursor: pointer;
+            font-size: 0.85em;
             font-weight: 600;
+            transition: all 0.2s;
         }
+        .chain-btn:hover, .category-tab:hover { transform: translateY(-2px); }
         .chain-btn.active, .category-tab.active {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.3));
             border-color: #ffd700;
             color: #ffd700;
         }
-        .loading-container { text-align: center; padding: 60px 20px; }
-        .error-container { text-align: center; padding: 60px 20px; color: #e74c3c; }
-        .retry-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            border: none;
-            border-radius: 25px;
-            color: #1a0000;
-            font-weight: 600;
-            cursor: pointer;
+        
+        /* 网格布局 - 紧凑显示 */
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 10px;
         }
-        .hotspot-card {
-            background: linear-gradient(135deg, rgba(74, 0, 0, 0.8), rgba(26, 0, 0, 0.9));
+        
+        .topic-card {
+            background: linear-gradient(135deg, rgba(74, 0, 0, 0.9), rgba(26, 0, 0, 0.95));
             border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.85em;
         }
-        .hotspot-header {
+        
+        .topic-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+            gap: 10px;
         }
-        .hotspot-title h3 {
+        .topic-title {
+            flex: 1;
+            font-weight: 600;
             color: #ffd700;
-            margin: 0 0 10px 0;
-            font-size: 1.2em;
+            font-size: 0.95em;
+            line-height: 1.3;
         }
-        .hotspot-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .topic-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
         .badge {
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
             font-size: 0.75em;
-            font-weight: 500;
-            background: rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.15);
             color: #ffaa00;
-            border: 1px solid rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            white-space: nowrap;
         }
-        .hotspot-summary {
+        
+        .topic-type {
+            color: #888;
+            font-size: 0.75em;
+            margin-bottom: 6px;
+        }
+        
+        .topic-summary {
             background: rgba(255, 215, 0, 0.05);
-            border-left: 3px solid #ffd700;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 0 8px 8px 0;
-        }
-        .hotspot-summary p {
+            border-left: 2px solid #ffd700;
+            padding: 6px 8px;
+            margin-bottom: 8px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.8em;
             color: #ffaa00;
-            margin: 0;
-            line-height: 1.6;
-            font-size: 0.9em;
+            line-height: 1.4;
+            max-height: 60px;
+            overflow: hidden;
+        }
+        
+        .token-list {
+            margin-top: 8px;
         }
         .token-list h4 {
             color: #ffd700;
-            margin: 15px 0 10px;
-            font-size: 1em;
+            font-size: 0.8em;
+            margin-bottom: 6px;
         }
         .token-item {
             background: rgba(255, 215, 0, 0.05);
             border: 1px solid rgba(255, 215, 0, 0.1);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border-radius: 6px;
+            padding: 6px 8px;
+            margin-bottom: 5px;
+            font-size: 0.85em;
         }
         .token-symbol {
             color: #ffd700;
             font-weight: 600;
-            font-size: 1.1em;
+            font-size: 0.9em;
+            margin-bottom: 4px;
         }
         .token-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 8px;
-            margin-top: 8px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            font-size: 0.85em;
         }
-        .token-stat {
-            font-size: 0.8em;
-            color: #888;
-        }
-        .token-stat-value {
-            color: #ffd700;
-            font-weight: 600;
-            margin-top: 2px;
-        }
+        .token-stat { text-align: center; }
+        .token-stat-label { color: #666; font-size: 0.8em; }
+        .token-stat-value { color: #ffd700; font-weight: 600; font-size: 0.9em; }
+        
         .meme-contract {
             background: rgba(0,0,0,0.3);
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-family: monospace;
-            font-size: 0.75em;
-            color: #888;
+            font-size: 0.7em;
+            color: #666;
             cursor: pointer;
             word-break: break-all;
-            margin-top: 8px;
+            margin-top: 4px;
+            text-align: center;
         }
         .meme-contract:hover { background: rgba(255, 215, 0, 0.1); color: #ffd700; }
-        .last-update { text-align: center; color: #888; margin-top: 30px; }
-        .data-info {
+        
+        .topic-link {
+            display: inline-block;
+            color: #ffd700;
+            text-decoration: none;
+            font-size: 0.75em;
+            margin-top: 6px;
+            padding: 3px 8px;
             background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 8px;
-            padding: 10px 15px;
-            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .last-update {
             text-align: center;
-            color: #ffaa00;
-            font-size: 0.9em;
+            color: #666;
+            font-size: 0.75em;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .loading-container, .error-container, .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        
+        @media (max-width: 768px) {
+            .topics-grid { grid-template-columns: 1fr; }
+            .token-stats { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -155,16 +235,10 @@
         </div>
 
         <div id="meme-container">
-            <div class="loading-container">
-                <p>🔄 正在加载数据...</p>
-            </div>
+            <div class="loading-container"><p>🔄 正在加载数据...</p></div>
         </div>
 
         <div class="last-update" id="last-update"></div>
-
-        <footer>
-            <p><a href="index.html">🏠 返回首页</a> | <a href="https://github.com/jianjun156/caishenye" target="_blank">📁 GitHub</a></p>
-        </footer>
     </div>
 
     <script>
@@ -187,29 +261,19 @@
                 memeData = await response.json();
                 updateDataInfo();
             } catch (error) {
-                console.error('加载数据失败:', error);
                 document.getElementById('meme-container').innerHTML = `
-                    <div class="error-container">
-                        <h3>⚠️ 数据加载失败</h3>
-                        <p>${error.message}</p>
-                        <button class="retry-btn" onclick="location.reload()">🔄 刷新</button>
-                    </div>
-                `;
+                    <div class="error-container"><h3>⚠️ 数据加载失败</h3><p>${error.message}</p>
+                    <button class="chain-btn" onclick="location.reload()" style="margin-top:10px;">🔄 刷新</button></div>`;
             }
         }
         
         function updateDataInfo() {
             const chainData = memeData[currentChain];
             if (!chainData) return;
-            
             const total = Object.values(chainData).reduce((sum, cat) => sum + (cat.count || 0), 0);
             const timestamp = chainData.latest?.timestamp || '';
-            
-            document.getElementById('data-info').textContent = 
-                `📊 共 ${total} 个热点话题 | 最后更新：${new Date(timestamp).toLocaleString('zh-CN')}`;
-            
-            document.getElementById('last-update').textContent = 
-                `数据更新时间：${new Date(timestamp).toLocaleString('zh-CN')} (每 15 分钟自动更新)`;
+            document.getElementById('data-info').textContent = `📊 共 ${total} 个热点 | 更新于 ${new Date(timestamp).toLocaleTimeString('zh-CN')}`;
+            document.getElementById('last-update').textContent = `最后更新：${new Date(timestamp).toLocaleString('zh-CN')} (每 15 分钟自动更新)`;
         }
         
         function setupChainSelector() {
@@ -238,8 +302,8 @@
         function renderMemeRush() {
             const container = document.getElementById('meme-container');
             const categoryNames = {latest: '🔥 最新', rising: '📈 上升', viral: '🚀 病毒'};
-            
             const chainData = memeData[currentChain];
+            
             if (!chainData) {
                 container.innerHTML = '<div class="empty-state"><h3>📭 暂无数据</h3></div>';
                 return;
@@ -249,82 +313,50 @@
             const topics = categoryData?.data || [];
             
             if (!topics || topics.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>📭 暂无数据</h3><p>该类目下暂时没有热点话题</p></div>';
+                container.innerHTML = '<div class="empty-state"><h3>📭 暂无数据</h3></div>';
                 return;
             }
             
-            container.innerHTML = topics.map((topic, i) => {
-                const name = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知话题';
+            container.innerHTML = `<div class="topics-grid">${topics.map(topic => {
+                const name = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知';
                 const netInflow = parseFloat(topic.topicNetInflow || 0);
                 const tokenCount = topic.tokenSize || 0;
                 const progress = parseFloat(topic.progress || 0);
-                const type = topic.type || 'Unknown';
+                const type = topic.type || '';
                 const tokens = topic.tokenList || [];
                 
                 return `
-                    <div class="hotspot-card">
-                        <div class="hotspot-header">
-                            <div class="hotspot-title">
-                                <h3>${name}</h3>
-                                <div style="color:#888;font-size:0.85em;margin-top:5px;">📊 类型：${type}</div>
-                            </div>
-                            <div class="hotspot-badges">
-                                <span class="badge">🔥 ${tokenCount} 代币</span>
-                                <span class="badge">💰 $${(netInflow/1000).toFixed(2)}K</span>
-                                <span class="badge">📈 进度 ${progress.toFixed(1)}%</span>
+                    <div class="topic-card">
+                        <div class="topic-header">
+                            <div class="topic-title">${name}</div>
+                            <div class="topic-badges">
+                                <span class="badge">💰 $${(netInflow/1000).toFixed(1)}K</span>
+                                <span class="badge">📈 ${progress.toFixed(0)}%</span>
                             </div>
                         </div>
-                        
-                        ${topic.aiSummary?.aiSummaryCn ? `
-                            <div class="hotspot-summary">
-                                <p>🤖 ${topic.aiSummary.aiSummaryCn}</p>
-                            </div>
-                        ` : ''}
-                        
+                        <div class="topic-type">📊 ${type} · 🔥 ${tokenCount}代币</div>
+                        ${topic.aiSummary?.aiSummaryCn ? `<div class="topic-summary">🤖 ${topic.aiSummary.aiSummaryCn.substring(0, 100)}${topic.aiSummary.aiSummaryCn.length > 100 ? '...' : ''}</div>` : ''}
                         ${tokens.length > 0 ? `
                             <div class="token-list">
-                                <h4>🏷️ 关联代币 (${tokens.length})</h4>
-                                ${tokens.slice(0, 5).map(token => `
+                                <h4>🏷️ 关联代币</h4>
+                                ${tokens.slice(0, 3).map(token => `
                                     <div class="token-item">
                                         <div class="token-symbol">${token.symbol}</div>
                                         <div class="token-stats">
-                                            <div class="token-stat">
-                                                <div>市值</div>
-                                                <div class="token-stat-value">$${(parseFloat(token.marketCap||0)/1000).toFixed(2)}K</div>
-                                            </div>
-                                            <div class="token-stat">
-                                                <div>流动性</div>
-                                                <div class="token-stat-value">$${(parseFloat(token.liquidity||0)/1000).toFixed(2)}K</div>
-                                            </div>
-                                            <div class="token-stat">
-                                                <div>24h 涨跌</div>
-                                                <div class="token-stat-value" style="color: ${parseFloat(token.priceChange24h||0) >= 0 ? '#2ecc71' : '#e74c3c'}">
-                                                    ${parseFloat(token.priceChange24h||0) >= 0 ? '+' : ''}${parseFloat(token.priceChange24h||0).toFixed(2)}%
-                                                </div>
-                                            </div>
-                                            <div class="token-stat">
-                                                <div>持有者</div>
-                                                <div class="token-stat-value">👥 ${token.holders||0}</div>
-                                            </div>
+                                            <div class="token-stat"><div class="token-stat-label">市值</div><div class="token-stat-value">$${(parseFloat(token.marketCap||0)/1000).toFixed(1)}K</div></div>
+                                            <div class="token-stat"><div class="token-stat-label">流动性</div><div class="token-stat-value">$${(parseFloat(token.liquidity||0)/1000).toFixed(1)}K</div></div>
+                                            <div class="token-stat"><div class="token-stat-label">24h</div><div class="token-stat-value" style="color:${parseFloat(token.priceChange24h||0)>=0?'#2ecc71':'#e74c3c'}">${parseFloat(token.priceChange24h||0)>=0?'+':''}${parseFloat(token.priceChange24h||0).toFixed(1)}%</div></div>
+                                            <div class="token-stat"><div class="token-stat-label">持有者</div><div class="token-stat-value">${token.holders||0}</div></div>
                                         </div>
-                                        <div class="meme-contract" onclick="navigator.clipboard.writeText('${token.contractAddress}');this.textContent='✅ 已复制!';setTimeout(()=>this.textContent='📋 '+this.dataset.addr,1500);" data-addr="${token.contractAddress}">
-                                            📋 ${token.contractAddress}
-                                        </div>
+                                        <div class="meme-contract" onclick="navigator.clipboard.writeText('${token.contractAddress}');this.textContent='✅已复制';setTimeout(()=>this.textContent='📋 '+this.dataset.addr,1500);" data-addr="${token.contractAddress}">📋${token.contractAddress.substring(0,20)}...${token.contractAddress.substring(token.contractAddress.length-8)}</div>
                                     </div>
                                 `).join('')}
                             </div>
                         ` : ''}
-                        
-                        ${topic.topicLink ? `
-                            <div style="margin-top:15px;">
-                                <a href="${topic.topicLink}" target="_blank" style="color:#ffd700;text-decoration:none;font-size:0.9em;">
-                                    🔗 查看原文 →
-                                </a>
-                            </div>
-                        ` : ''}
+                        ${topic.topicLink ? `<a href="${topic.topicLink}" target="_blank" class="topic-link">🔗 原文</a>` : ''}
                     </div>
                 `;
-            }).join('');
+            }).join('')}</div>`;
         }
     </script>
 </body>
