@@ -24,7 +24,7 @@ jobs:
           const zlib = require('zlib');
           const fs = require('fs');
           
-          // Topic Rush API - 热点话题
+          // Topic Rush API - Binance Web3 热点话题
           const API_URL = 'https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/social-rush/rank/list';
           
           const categories = {
@@ -49,7 +49,8 @@ jobs:
                 method: 'GET',
                 headers: {
                   'Accept': 'application/json',
-                  'Accept-Encoding': 'gzip, deflate'
+                  'Accept-Encoding': 'gzip, deflate',
+                  'User-Agent': 'Mozilla/5.0'
                 }
               };
               
@@ -64,34 +65,48 @@ jobs:
                   gunzip.on('end', () => {
                     try {
                       const result = JSON.parse(Buffer.concat(chunks).toString());
-                      if (result.code === '000000' && result.data) {
-                        resolve(result.data.rank || []);
+                      console.log(`  API Response code: ${result.code}`);
+                      if (result.code === '000000' && result.data && result.data.rank) {
+                        console.log(`  Topics found: ${result.data.rank.length}`);
+                        resolve(result.data.rank);
                       } else {
+                        console.log(`  No data: ${JSON.stringify(result).substring(0, 200)}`);
                         resolve([]);
                       }
                     } catch (e) {
+                      console.error(`  Parse error: ${e.message}`);
                       reject(new Error('JSON 解析失败：' + e.message));
                     }
                   });
-                  gunzip.on('error', reject);
+                  gunzip.on('error', (err) => {
+                    console.error(`  Gunzip error: ${err.message}`);
+                    reject(err);
+                  });
                 } else {
                   res.on('data', chunk => chunks.push(chunk));
                   res.on('end', () => {
                     try {
                       const result = JSON.parse(Buffer.concat(chunks).toString());
-                      if (result.code === '000000' && result.data) {
-                        resolve(result.data.rank || []);
+                      console.log(`  API Response code: ${result.code}`);
+                      if (result.code === '000000' && result.data && result.data.rank) {
+                        console.log(`  Topics found: ${result.data.rank.length}`);
+                        resolve(result.data.rank);
                       } else {
+                        console.log(`  No data: ${JSON.stringify(result).substring(0, 200)}`);
                         resolve([]);
                       }
                     } catch (e) {
+                      console.error(`  Parse error: ${e.message}`);
                       reject(new Error('JSON 解析失败：' + e.message));
                     }
                   });
                 }
               });
               
-              req.on('error', reject);
+              req.on('error', (err) => {
+                console.error(`  Request error: ${err.message}`);
+                reject(err);
+              });
               req.end();
             });
           }
@@ -102,7 +117,7 @@ jobs:
             for (const [chainName, chainId] of Object.entries(chains)) {
               allData[chainName] = {};
               for (const [categoryName, rankType] of Object.entries(categories)) {
-                console.log(`Fetching ${chainName} - ${categoryName}...`);
+                console.log(`\n📊 Fetching ${chainName} - ${categoryName}...`);
                 try {
                   const data = await fetchData(chainId, rankType);
                   allData[chainName][categoryName] = {
@@ -110,7 +125,7 @@ jobs:
                     count: data.length,
                     timestamp: new Date().toISOString()
                   };
-                  console.log(`  ✅ Got ${data.length} topics`);
+                  console.log(`  ✅ Saved ${data.length} topics`);
                 } catch (error) {
                   console.error(`  ❌ Error: ${error.message}`);
                   allData[chainName][categoryName] = {
