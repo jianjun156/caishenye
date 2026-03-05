@@ -1,0 +1,36 @@
+{
+  "bsc": {
+    "latest": {
+      "data": [],
+      "count": 0,
+      "timestamp": "2026-03-05T09:30:15.728Z"
+    },
+    "rising": {
+      "data": [],
+      "count": 0,
+      "timestamp": "2026-03-05T09:30:15.896Z"
+    },
+    "viral": {
+      "data": [],
+      "count": 0,
+      "timestamp": "2026-03-05T09:30:16.066Z"
+    }
+  },
+  "solana": {
+    "latest": {
+      "data": [],
+      "count": 0,
+      "timestamp": "2026-03-05T09:30:16.241Z"
+    },
+    "rising": {
+      "data": [],
+      "count": 0,
+      "timestamp": "2026-03-05T09:30:16.409Z"
+    },
+    "viral": {
+      "data": [],
+      "count": 0,
+      "timestamp": "2026-03-05T09:30:16.588Z"
+    }
+  }
+}
