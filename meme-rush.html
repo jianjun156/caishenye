@@ -5,62 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 Meme Rush 热点监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=202603051700">
     <style>
-        .chain-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .chain-btn {
+        .chain-selector, .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .chain-btn, .category-tab {
             padding: 10px 20px;
             background: rgba(139, 0, 0, 0.6);
             border: 2px solid rgba(255, 215, 0, 0.3);
             border-radius: 20px;
             color: #ffaa00;
             cursor: pointer;
-            transition: all 0.3s;
             font-weight: 600;
         }
-        
-        .chain-btn:hover,
-        .chain-btn.active {
+        .chain-btn.active, .category-tab.active {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.3));
             border-color: #ffd700;
             color: #ffd700;
-            transform: translateY(-2px);
         }
-        
-        .loading-container {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .loading-spinner-large {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 215, 0, 0.2);
-            border-top-color: #ffd700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .error-container {
-            text-align: center;
-            padding: 60px 20px;
-            color: #e74c3c;
-        }
-        
+        .loading-container { text-align: center; padding: 60px 20px; }
+        .error-container { text-align: center; padding: 60px 20px; color: #e74c3c; }
         .retry-btn {
             margin-top: 20px;
             padding: 12px 30px;
@@ -70,22 +33,40 @@
             color: #1a0000;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        
-        .retry-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        .hotspot-card {
+            background: linear-gradient(135deg, rgba(74, 0, 0, 0.8), rgba(26, 0, 0, 0.9));
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
         }
-        
-        .last-update {
+        .token-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .token-stat {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
             text-align: center;
-            color: #888;
-            font-size: 0.9em;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 215, 0, 0.1);
         }
+        .token-stat-label { font-size: 0.75em; color: #888; }
+        .token-stat-value { font-size: 0.95em; color: #ffd700; font-weight: 600; }
+        .meme-contract {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8em;
+            color: #888;
+            cursor: pointer;
+            word-break: break-all;
+        }
+        .meme-contract:hover { background: rgba(255, 215, 0, 0.1); color: #ffd700; }
+        .last-update { text-align: center; color: #888; margin-top: 30px; }
     </style>
 </head>
 <body>
@@ -93,7 +74,7 @@
         <header>
             <div class="mascot">🚀</div>
             <h1>Meme Rush 热点监控</h1>
-            <p class="subtitle">动态调用 Binance Web3 Meme Rush API，实时捕捉金狗机会</p>
+            <p class="subtitle">Binance Web3 Meme Rush API - CORS 代理模式</p>
             <span class="status">🟢 实时监控中</span>
         </header>
 
@@ -103,48 +84,42 @@
         </div>
 
         <div class="category-tabs">
-            <button class="category-tab active" data-category="10">🔥 最新 (New)</button>
-            <button class="category-tab" data-category="20">📈 上升 (Finalizing)</button>
-            <button class="category-tab" data-category="30">🚀 病毒 (Migrated)</button>
+            <button class="category-tab active" data-category="10">🔥 最新</button>
+            <button class="category-tab" data-category="20">📈 上升</button>
+            <button class="category-tab" data-category="30">🚀 病毒</button>
         </div>
 
         <div id="meme-container">
             <div class="loading-container">
-                <div class="loading-spinner-large"></div>
-                <p>正在加载 Meme Rush 数据...</p>
+                <p>🔄 正在加载数据...</p>
             </div>
         </div>
 
         <div class="last-update" id="last-update"></div>
 
         <footer>
-            <p>🚀 财神爷 | 职业 Meme 土狗交易专家 | 随时准备捕捉下一个 100x</p>
-            <p>
-                <a href="index.html">🏠 返回首页</a> |
-                <a href="https://github.com/jianjun156/caishenye" target="_blank">📁 GitHub</a>
-            </p>
+            <p><a href="index.html">🏠 返回首页</a> | <a href="https://github.com/jianjun156/caishenye" target="_blank">📁 GitHub</a></p>
         </footer>
     </div>
 
     <script>
-        // API 配置 - Binance Web3 Meme Rush API
+        // 使用 CORS 代理解决跨域问题
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
         const API_URL = 'https://web3.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/market/token/pulse/rank/list';
-        let currentChain = '56'; // 默认 BSC
-        let currentCategory = 10; // 默认最新 (New)
         
-        // 页面加载完成后初始化
+        let currentChain = '56';
+        let currentCategory = 10;
+        
         document.addEventListener('DOMContentLoaded', () => {
             setupChainSelector();
             setupCategoryTabs();
             loadMemeRush(currentChain, currentCategory);
         });
         
-        // 设置链选择器
         function setupChainSelector() {
-            const buttons = document.querySelectorAll('.chain-btn');
-            buttons.forEach(btn => {
+            document.querySelectorAll('.chain-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    buttons.forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.chain-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentChain = btn.dataset.chain;
                     loadMemeRush(currentChain, currentCategory);
@@ -152,12 +127,10 @@
             });
         }
         
-        // 设置类目标签
         function setupCategoryTabs() {
-            const tabs = document.querySelectorAll('.category-tab');
-            tabs.forEach(tab => {
+            document.querySelectorAll('.category-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     currentCategory = parseInt(tab.dataset.category);
                     loadMemeRush(currentChain, currentCategory);
@@ -165,169 +138,117 @@
             });
         }
         
-        // 加载 Meme Rush 数据
         async function loadMemeRush(chainId, rankType) {
             const container = document.getElementById('meme-container');
-            const categoryNames = {
-                10: '🔥 最新 (New)',
-                20: '📈 上升 (Finalizing)',
-                30: '🚀 病毒 (Migrated)'
-            };
+            const categoryNames = {10: '🔥 最新', 20: '📈 上升', 30: '🚀 病毒'};
             
-            container.innerHTML = `
-                <div class="loading-container">
-                    <div class="loading-spinner-large"></div>
-                    <p>正在加载 ${categoryNames[rankType]} 数据...</p>
-                </div>
-            `;
+            container.innerHTML = '<div class="loading-container"><p>🔄 正在加载 ' + categoryNames[rankType] + ' 数据...</p></div>';
             
             try {
-                // 调用 Binance Web3 Meme Rush API (POST 方式)
-                const response = await fetch(API_URL, {
+                // 使用 CORS 代理
+                const postData = JSON.stringify({
+                    chainId: chainId,
+                    rankType: rankType,
+                    limit: 50
+                });
+                
+                // 使用 allorigins.win 代理 POST 请求
+                const proxyUrl = 'https://api.allorigins.win/post?url=' + encodeURIComponent(API_URL);
+                
+                const response = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        chainId: chainId,
-                        rankType: rankType,
-                        limit: 50
+                        url: API_URL,
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: postData
                     })
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API 请求失败：${response.status}`);
+                    throw new Error('代理请求失败：' + response.status);
                 }
                 
-                const result = await response.json();
+                const proxyResult = await response.json();
+                
+                if (!proxyResult.contents) {
+                    throw new Error('代理返回空数据');
+                }
+                
+                const result = JSON.parse(proxyResult.contents);
                 
                 if (result.code !== '000000') {
-                    throw new Error(result.message || 'API 返回错误');
+                    throw new Error(result.message || 'API 错误：' + result.code);
                 }
                 
                 const data = result.data;
                 
                 if (!data || data.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <h3>📭 暂无${categoryNames[rankType]}数据</h3>
-                            <p>该类目下暂时没有 Meme 代币</p>
-                        </div>
-                    `;
+                    container.innerHTML = '<div class="empty-state"><h3>📭 暂无数据</h3><p>该类目下暂时没有 Meme 代币</p></div>';
                     return;
                 }
                 
                 renderMemeRush(data, rankType);
-                
-                // 更新最后更新时间
-                document.getElementById('last-update').textContent = 
-                    `最后更新：${new Date().toLocaleString('zh-CN')}`;
+                document.getElementById('last-update').textContent = '最后更新：' + new Date().toLocaleString('zh-CN');
                 
             } catch (error) {
-                console.error('加载 Meme Rush 数据失败:', error);
+                console.error('加载失败:', error);
                 container.innerHTML = `
                     <div class="error-container">
                         <h3>⚠️ 数据加载失败</h3>
                         <p>${error.message}</p>
-                        <p>可能是网络问题或 API 暂时不可用</p>
-                        <button class="retry-btn" onclick="loadMemeRush('${chainId}', ${rankType})">🔄 重新加载</button>
+                        <button class="retry-btn" onclick="loadMemeRush('${chainId}', ${rankType})">🔄 重试</button>
                     </div>
                 `;
             }
         }
         
-        // 渲染 Meme Rush 数据
         function renderMemeRush(tokens, rankType) {
             const container = document.getElementById('meme-container');
-            const categoryNames = {
-                10: '🔥 最新',
-                20: '📈 上升',
-                30: '🚀 病毒'
-            };
+            const categoryNames = {10: '🔥 最新', 20: '📈 上升', 30: '🚀 病毒'};
+            const protocolNames = {2001: 'Four.meme', 2002: 'Flap', 1001: 'Pump.fun', 1010: 'Moonshot'};
             
-            container.innerHTML = tokens.map((token, index) => {
-                const symbol = token.symbol || 'Unknown';
-                const name = token.name || symbol;
-                const price = parseFloat(token.price || 0);
-                const priceChange = parseFloat(token.priceChange || 0);
-                const marketCap = parseFloat(token.marketCap || 0);
-                const liquidity = parseFloat(token.liquidity || 0);
-                const volume = parseFloat(token.volume || 0);
-                const holders = token.holders || 0;
-                const progress = parseFloat(token.progress || 0);
-                const contractAddress = token.contractAddress || '';
-                const protocol = token.protocol || 0;
-                const migrateStatus = token.migrateStatus || 0;
-                
-                // 协议名称
-                const protocolNames = {
-                    2001: 'Four.meme',
-                    2002: 'Flap',
-                    1001: 'Pump.fun',
-                    1010: 'Moonshot'
-                };
-                
-                return `
-                    <div class="hotspot-card" style="animation-delay: ${index * 0.1}s">
-                        <div class="hotspot-header">
-                            <div class="hotspot-title">
-                                <span class="hotspot-icon">${categoryNames[rankType] || '🔥'}</span>
-                                <h3>${symbol} ${name !== symbol ? `- ${name}` : ''}</h3>
-                            </div>
-                            <div class="hotspot-badges">
-                                <span class="badge badge-hot">${protocolNames[protocol] || 'Unknown'}</span>
-                                <span class="badge badge-update">进度 ${progress.toFixed(2)}%</span>
-                                ${migrateStatus === 1 ? '<span class="badge" style="background: rgba(46, 204, 113, 0.2); color: #2ecc71; border-color: rgba(46, 204, 113, 0.3);">✅ 已迁移</span>' : ''}
-                            </div>
+            container.innerHTML = tokens.map((token, i) => `
+                <div class="hotspot-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                        <h3 style="color:#ffd700;margin:0;">${categoryNames[rankType]} - ${token.symbol || 'Unknown'}</h3>
+                        <span style="background:rgba(255,215,0,0.2);padding:5px 12px;border-radius:15px;color:#ffaa00;">
+                            ${protocolNames[token.protocol] || 'Unknown'}
+                        </span>
+                    </div>
+                    <div class="token-stats">
+                        <div class="token-stat">
+                            <div class="token-stat-label">市值</div>
+                            <div class="token-stat-value">$${(parseFloat(token.marketCap||0)/1000).toFixed(2)}K</div>
                         </div>
-                        
-                        <div class="token-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px;">
-                            <div class="token-stat">
-                                <div class="token-stat-label">市值</div>
-                                <div class="token-stat-value">$${(marketCap/1000).toFixed(2)}K</div>
-                            </div>
-                            <div class="token-stat">
-                                <div class="token-stat-label">流动性</div>
-                                <div class="token-stat-value">$${(liquidity/1000).toFixed(2)}K</div>
-                            </div>
-                            <div class="token-stat">
-                                <div class="token-stat-label">24h 成交量</div>
-                                <div class="token-stat-value">$${(volume/1000).toFixed(2)}K</div>
-                            </div>
-                            <div class="token-stat">
-                                <div class="token-stat-label">持有者</div>
-                                <div class="token-stat-value">👥 ${holders}</div>
-                            </div>
-                            <div class="token-stat">
-                                <div class="token-stat-label">24h 涨跌</div>
-                                <div class="token-stat-value" style="color: ${priceChange >= 0 ? '#2ecc71' : '#e74c3c'}">
-                                    ${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%
-                                </div>
-                            </div>
+                        <div class="token-stat">
+                            <div class="token-stat-label">流动性</div>
+                            <div class="token-stat-value">$${(parseFloat(token.liquidity||0)/1000).toFixed(2)}K</div>
                         </div>
-                        
-                        <div class="meme-contract" title="点击复制合约地址">
-                            📋 合约地址：${contractAddress}
+                        <div class="token-stat">
+                            <div class="token-stat-label">成交量</div>
+                            <div class="token-stat-value">$${(parseFloat(token.volume||0)/1000).toFixed(2)}K</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-label">持有者</div>
+                            <div class="token-stat-value">👥 ${token.holders||0}</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-label">进度</div>
+                            <div class="token-stat-value">${(parseFloat(token.progress||0)).toFixed(2)}%</div>
                         </div>
                     </div>
-                `;
-            }).join('');
-            
-            // 添加点击复制合约地址功能
-            document.querySelectorAll('.meme-contract').forEach(el => {
-                el.style.cursor = 'pointer';
-                el.addEventListener('click', function() {
-                    const address = this.textContent.replace('📋 合约地址：', '');
-                    navigator.clipboard.writeText(address).then(() => {
-                        const original = this.textContent;
-                        this.textContent = '✅ 已复制!';
-                        setTimeout(() => {
-                            this.textContent = original;
-                        }, 1500);
-                    });
-                });
-            });
+                    <div class="meme-contract" onclick="navigator.clipboard.writeText('${token.contractAddress}');this.textContent='✅ 已复制!';setTimeout(()=>this.textContent='📋 '+this.dataset.addr,1500);" data-addr="${token.contractAddress}">
+                        📋 ${token.contractAddress}
+                    </div>
+                </div>
+            `).join('');
         }
     </script>
 </body>
