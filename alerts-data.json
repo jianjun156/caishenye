@@ -34,6 +34,7 @@
             "marketCap": "4224.378449985733839",
             "priceChange24h": "2.09",
             "liquidity": "505.52578742359408826",
+            "protocol": 2001,
             "holders": 2
           },
           {
@@ -46,6 +47,7 @@
             "marketCap": "4094.3641639828617369",
             "priceChange24h": "0",
             "liquidity": "773.02384223199492886",
+            "protocol": 2001,
             "holders": 2
           }
         ]
@@ -84,6 +86,7 @@
             "marketCap": "13534.452672676135392",
             "priceChange24h": "241.82",
             "liquidity": "7274.4107664120357552",
+            "protocol": 2001,
             "holders": 78
           },
           {
@@ -96,6 +99,7 @@
             "marketCap": "4094.3641639828617369",
             "priceChange24h": "0",
             "liquidity": "773.02384223199492886",
+            "protocol": 2001,
             "holders": 2
           }
         ]
