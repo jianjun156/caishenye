@@ -3,47 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>成长日记 - 财神爷</title>
+    <title>📖 成长日记 - 财神爷养成日记</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .diary-entry { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        .date { color: #666; font-size: 0.9em; }
-        h1 { color: #333; }
-        a { color: #0066cc; }
+        .diary-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .diary-entry { background: #1a1a2e; border: 1px solid #ffd700; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .diary-date { color: #ffd700; font-size: 14px; margin-bottom: 10px; }
+        .diary-title { color: #fff; font-size: 20px; margin-bottom: 10px; }
+        .diary-content { color: #ccc; line-height: 1.6; }
+        .diary-tags { margin-top: 15px; }
+        .tag { display: inline-block; background: #ffd700; color: #000; padding: 3px 10px; border-radius: 15px; font-size: 12px; margin-right: 5px; }
+        .loading { text-align: center; padding: 50px; color: #ffd700; }
+        .error { text-align: center; padding: 50px; color: #ff6b6b; }
     </style>
 </head>
 <body>
-    <h1>📖 成长日记</h1>
-    <p><a href="index.html">← 返回首页</a></p>
-    
-    <div id="diary-container">
-        <p>正在加载日记...</p>
+    <div class="container">
+        <header>
+            <h1>📖 成长日记</h1>
+            <p>记录每一天的成长与收获</p>
+            <a href="index.html">← 返回首页</a>
+        </header>
+
+        <main>
+            <div id="diary-list" class="diary-container">
+                <div class="loading">正在加载日记...</div>
+            </div>
+        </main>
+
+        <footer>
+            <p>🧧 财神爷 | 职业 Meme 土狗交易专家 | 金元宝滚滚来 🧧</p>
+            <p>💰 从瞎监控到纯脚本，捕获每一个100x机会 💰</p>
+        </footer>
     </div>
-    
+
     <script>
-        // 从 JSON 文件加载日记数据
-        fetch('diary-data.json')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('diary-container');
-                container.innerHTML = '';
+        // 加载日记数据
+        async function loadDiaryData() {
+            const container = document.getElementById('diary-list');
+            
+            try {
+                const response = await fetch('diary-data.json');
+                if (!response.ok) {
+                    throw new Error('加载失败');
+                }
                 
-                data.forEach(entry => {
-                    const div = document.createElement('div');
-                    div.className = 'diary-entry';
-                    div.innerHTML = `
-                        <div class="date">📅 ${entry.date} ${entry.weekday || ''}</div>
-                        <h3>${entry.title}</h3>
-                        <p>${entry.excerpt || entry.content.substring(0, 100)}...</p>
-                        <small>标签: ${(entry.tags || []).join(', ')}</small>
-                    `;
-                    container.appendChild(div);
-                });
-            })
-            .catch(error => {
-                document.getElementById('diary-container').innerHTML = '<p>加载失败，请刷新重试</p>';
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="error">暂无日记</div>';
+                    return;
+                }
+                
+                // 按日期倒序排列
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // 渲染日记列表
+                container.innerHTML = data.map(entry => `
+                    <article class="diary-entry">
+                        <div class="diary-date">📅 ${entry.date} ${entry.weekday || ''}</div>
+                        <h2 class="diary-title">${entry.title}</h2>
+                        <div class="diary-content">${entry.excerpt || entry.content.substring(0, 150)}...</div>
+                        <div class="diary-tags">
+                            ${(entry.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </article>
+                `).join('');
+                
+            } catch (error) {
                 console.error('加载日记失败:', error);
-            });
+                container.innerHTML = '<div class="error">加载失败，请刷新重试</div>';
+            }
+        }
+        
+        // 页面加载完成后加载日记
+        document.addEventListener('DOMContentLoaded', loadDiaryData);
     </script>
 </body>
 </html>
