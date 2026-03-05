@@ -1,0 +1,115 @@
+{
+  "lastUpdate": "2026-03-05T03:30:14.552Z",
+  "totalAlerts": 16,
+  "alerts": [
+    {
+      "id": "aef6aea7-804e-4ed1-a96a-fe9c30d2df0d",
+      "timestamp": "2026-03-05T03:30:14.552Z",
+      "topic": {
+        "topicId": "aef6aea7-804e-4ed1-a96a-fe9c30d2df0d",
+        "chainId": "56",
+        "name": {
+          "topicNameEn": "AI Models Prefer Bitcoin Experiment",
+          "topicNameCn": "AI模型偏好比特币实验"
+        },
+        "type": "Culture",
+        "close": 0,
+        "topicLink": "https://x.com/aryonserwin/status/2029127122678321443",
+        "tokenSize": 2,
+        "progress": "100",
+        "aiSummary": {
+          "aiSummaryEn": "According to justadev's post, a simulation experiment involving 36 AI models found that 22 of them selected Bitcoin as the preferred currency. None of the models chose fiat currency as the top option.",
+          "aiSummaryCn": "据justadev发布的帖子，在一场涉及36个AI模型的模拟实验中，22个模型将比特币作为首选货币，没有模型选择法币作为第一选项。"
+        },
+        "topicNetInflow": "1022.821394328593",
+        "topicNetInflow1h": "829.396950374853",
+        "tokenList": [
+          {
+            "chainId": "56",
+            "contractAddress": "0x50ea6e7187ab043cfc4e93b4882dfb1b65654444",
+            "symbol": "比特币",
+            "icon": "/images/web3-data/public/token/logos/DC1044FE7C97EC8D75A644144F2B6694.png",
+            "netInflow": "648.8674693513623",
+            "volumeBuy": "1927.9768670778128",
+            "volumeSell": "1279.1093977264507",
+            "marketCap": "4224.378449985733839",
+            "priceChange24h": "2.09",
+            "liquidity": "505.52578742359408826",
+            "protocol": 2001,
+            "holders": 2
+          },
+          {
+            "chainId": "56",
+            "contractAddress": "0x010052ac77ffa326b2ee2452c689c3528df1ffff",
+            "symbol": "AGNTCBALL",
+            "icon": "/images/web3-data/public/token/logos/EF118EA317C5199638A19C3AA08F71A1.png",
+            "netInflow": "373.9539249772307",
+            "volumeBuy": "386.51192111599744",
+            "volumeSell": "0",
+            "marketCap": "4094.3641639828617369",
+            "priceChange24h": "0",
+            "liquidity": "773.02384223199492886",
+            "protocol": 2001,
+            "holders": 2
+          }
+        ]
+      },
+      "reason": "新热点话题，可能有金狗机会！"
+    },
+    {
+      "id": "a46c52f4-c789-4235-8ae4-b0c54870111b",
+      "timestamp": "2026-03-05T03:30:14.551Z",
+      "topic": {
+        "topicId": "a46c52f4-c789-4235-8ae4-b0c54870111b",
+        "chainId": "56",
+        "name": {
+          "topicNameEn": "Agentic Launch Simplifies Token Launches on BNB Chain",
+          "topicNameCn": "Agentic Launch简化BNB链代币发行"
+        },
+        "type": "Culture",
+        "close": 0,
+        "topicLink": "https://x.com/agenticlaunch/status/2029123408378654850",
+        "tokenSize": 5,
+        "progress": "90.5451",
+        "aiSummary": {
+          "aiSummaryEn": "According to Agentic Launch's post, they provide a streamlined one-click solution for launching agentic tokens on the BNB Chain using the FourMeme API, supporting features such as tax tokens with burns and dividends, and offering the Agentic badge for launched tokens.",
+          "aiSummaryCn": "据Agentic Launch发布的帖子，他们通过FourMeme API提供一键发行支持销毁和分红功能的Agentic代币平台，并在BNB链上推出。"
+        },
+        "topicNetInflow": "3466.2033617153575",
+        "topicNetInflow1h": "3466.2033616825447",
+        "tokenList": [
+          {
+            "chainId": "56",
+            "contractAddress": "0x5cffd2e97864381a754cba5710eb66503c484444",
+            "symbol": "AGNTC",
+            "icon": "/images/web3-data/public/token/logos/45B791219C9DA765420CD277B1218134.png",
+            "netInflow": "3079.6914405993602",
+            "volumeBuy": "27124.672515323367",
+            "volumeSell": "24044.981074724004",
+            "marketCap": "13534.452672676135392",
+            "priceChange24h": "241.82",
+            "liquidity": "7274.4107664120357552",
+            "protocol": 2001,
+            "holders": 78
+          },
+          {
+            "chainId": "56",
+            "contractAddress": "0x010052ac77ffa326b2ee2452c689c3528df1ffff",
+            "symbol": "AGNTCBALL",
+            "icon": "/images/web3-data/public/token/logos/EF118EA317C5199638A19C3AA08F71A1.png",
+            "netInflow": "386.51192111599744",
+            "volumeBuy": "567.3783689309707",
+            "volumeSell": "180.86644781497324",
+            "marketCap": "4094.3641639828617369",
+            "priceChange24h": "0",
+            "liquidity": "773.02384223199492886",
+            "protocol": 2001,
+            "holders": 2
+          }
+        ]
+      },
+      "reason": "新热点话题，可能有金狗机会！"
+    }
+  ]
+}
+</function>
