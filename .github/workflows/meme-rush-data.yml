@@ -2,7 +2,8 @@ name: Meme Rush Data Fetcher
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    # 每 1 分钟执行一次
+    - cron: '* * * * *'
   workflow_dispatch:
 
 jobs:
