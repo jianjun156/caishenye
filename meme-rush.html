@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 Meme Rush 热点监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="style.css?v=202603061120">
+    <link rel="stylesheet" href="style.css?v=202603061230">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -251,11 +251,18 @@
             setupChainSelector();
             setupCategoryTabs();
             renderMemeRush();
+            
+            // 每1分钟自动刷新数据
+            setInterval(async () => {
+                console.log('[MemeRush] 自动刷新数据...');
+                await loadMemeData();
+                renderMemeRush();
+            }, 60000);
         });
         
         async function loadMemeData() {
             // 配置 API 地址（优先本地，回退GitHub）
-            const LOCAL_API = 'http://clawapi.weisgj.com/api/meme-rush';
+            const LOCAL_API = 'https://clawapi.weisgj.com/api/meme-rush';
             const GITHUB_URL = 'https://raw.githubusercontent.com/jianjun156/caishenye/main/meme-rush-data.json';
             
             // 本地 API 数据源
