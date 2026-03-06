@@ -88,7 +88,7 @@
         /* 列表头部 */
         .token-table-header {
             display: grid;
-            grid-template-columns: 80px 1fr 100px 100px 100px 100px 100px 60px;
+            grid-template-columns: 80px 1fr 80px 100px 100px 100px 100px 100px 60px;
             gap: 8px;
             padding: 10px 12px;
             background: rgba(255, 215, 0, 0.15);
@@ -112,7 +112,7 @@
         
         .token-row {
             display: grid;
-            grid-template-columns: 80px 1fr 100px 100px 100px 100px 100px 60px;
+            grid-template-columns: 80px 1fr 80px 100px 100px 100px 100px 100px 60px;
             gap: 8px;
             padding: 10px 12px;
             border-bottom: 1px solid rgba(255, 215, 0, 0.1);
@@ -120,6 +120,14 @@
             font-size: 0.8em;
             transition: background 0.2s;
         }
+        
+        .token-topic-link a {
+            color: #ffd700;
+            font-size: 0.75em;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .token-topic-link a:hover { text-decoration: underline; }
         .token-row:hover { background: rgba(255, 215, 0, 0.08); }
         .token-row:last-child { border-bottom: none; }
         
@@ -169,9 +177,9 @@
         
         @media (max-width: 900px) {
             .token-table-header, .token-row {
-                grid-template-columns: 50px 1fr 80px 80px 80px 50px;
+                grid-template-columns: 50px 1fr 60px 80px 80px 80px 60px;
             }
-            .token-ca, .token-link { display: none; }
+            .token-ca, .token-topic-link { display: none; }
         }
     </style>
 </head>
@@ -355,10 +363,12 @@
             let allTokens = [];
             topics.forEach((topic, topicIdx) => {
                 const topicName = topic.name?.topicNameCn || topic.name?.topicNameEn || '未知';
+                const topicLink = topic.topicLink || '';
                 (topic.tokenList || []).forEach(token => {
                     allTokens.push({
                         ...token,
                         topicName,
+                        topicLink,
                         topicIdx,
                         netInflow: parseFloat(topic.topicNetInflow || 0) + parseFloat(token.netInflow || 0)
                     });
@@ -377,6 +387,7 @@
                 <div class="token-table-header">
                     <div>#</div>
                     <div>代币</div>
+                    <div>话题</div>
                     <div style="text-align:right">净流入</div>
                     <div style="text-align:right">市值</div>
                     <div style="text-align:right">流动性</div>
@@ -392,20 +403,26 @@
                 const priceChange = parseFloat(token.priceChange24h || 0);
                 const changeClass = priceChange >= 0 ? 'green' : 'red';
                 const changePrefix = priceChange >= 0 ? '+' : '';
+                const chainPrefix = currentChain === 'bsc' ? 'bsc' : 'sol';
                 
                 html += `
                     <div class="token-row">
                         <div class="token-rank ${rank <= 3 ? 'top3' : ''}">${rank}</div>
                         <div class="token-info">
                             <div class="token-name">${token.symbol}</div>
-                            <div class="token-symbol">${token.topicName.substring(0, 30)}</div>
+                            <div class="token-symbol">${token.topicName.substring(0, 25)}</div>
+                        </div>
+                        <div class="token-topic-link">
+                            ${token.topicLink ? `<a href="${token.topicLink}" target="_blank">🔗X</a>` : ''}
                         </div>
                         <div class="token-stat">$${formatNumber(token.netInflow)}</div>
                         <div class="token-stat">$${formatNumber(token.marketCap)}</div>
                         <div class="token-stat">$${formatNumber(token.liquidity)}</div>
                         <div class="token-stat ${changeClass}">${changePrefix}${priceChange.toFixed(1)}%</div>
                         <div class="token-stat">${token.holders || 0}</div>
-                        <div class="token-ca" onclick="copyCA('${token.contractAddress}', this)">📋</div>
+                        <div class="token-ca">
+                            <a href="https://gmgn.ai/${chainPrefix}/token/${token.contractAddress}" target="_blank" style="color:#ffd700;text-decoration:none;">📋</a>
+                        </div>
                     </div>
                 `;
             });
