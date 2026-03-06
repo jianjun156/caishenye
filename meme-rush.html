@@ -255,7 +255,7 @@
         
         async function loadMemeData() {
             // 配置 API 地址（优先本地，回退GitHub）
-            const LOCAL_API = 'http://localhost:3456/api/meme-rush';
+            const LOCAL_API = 'http://clawapi.weisgj.com/api/meme-rush';
             const GITHUB_URL = 'https://raw.githubusercontent.com/jianjun156/caishenye/main/meme-rush-data.json';
             
             // 本地 API 数据源
@@ -264,7 +264,7 @@
             try {
                 // 尝试本地 API
                 const localResponse = await fetch(LOCAL_API + '?t=' + Date.now(), { 
-                    signal: AbortSignal.timeout(5000) // 5秒超时
+                    signal: AbortSignal.timeout(10000) // 10秒超时（远程API）
                 });
                 if (localResponse.ok) {
                     const localJson = await localResponse.json();
