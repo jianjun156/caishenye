@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 Meme Rush 热点监控 - 财神爷养成日记</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="style.css?v=202603051750">
+    <link rel="stylesheet" href="style.css?v=202603061120">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -254,26 +254,59 @@
         });
         
         async function loadMemeData() {
+            // 配置 API 地址（优先本地，回退GitHub）
+            const LOCAL_API = 'http://localhost:3456/api/meme-rush';
+            const GITHUB_URL = 'https://raw.githubusercontent.com/jianjun156/caishenye/main/meme-rush-data.json';
+            
+            // 本地 API 数据源
+            let useLocalSource = false;
+            
             try {
-                const githubUrl = 'https://raw.githubusercontent.com/jianjun156/caishenye/main/meme-rush-data.json';
-                const response = await fetch(githubUrl + '?t=' + Date.now());
-                if (!response.ok) throw new Error('数据文件不存在');
-                memeData = await response.json();
-                updateDataInfo();
+                // 尝试本地 API
+                const localResponse = await fetch(LOCAL_API + '?t=' + Date.now(), { 
+                    signal: AbortSignal.timeout(5000) // 5秒超时
+                });
+                if (localResponse.ok) {
+                    const localJson = await localResponse.json();
+                    if (localJson.success && localJson.data) {
+                        memeData = localJson.data;
+                        useLocalSource = true;
+                        console.log('[MemeRush] 使用本地API数据');
+                    }
+                }
             } catch (error) {
-                document.getElementById('meme-container').innerHTML = `
-                    <div class="error-container"><h3>⚠️ 数据加载失败</h3><p>${error.message}</p>
-                    <button class="chain-btn" onclick="location.reload()" style="margin-top:10px;">🔄 刷新</button></div>`;
+                console.log('[MemeRush] 本地API不可用，使用GitHub数据:', error.message);
             }
+            
+            // 回退到 GitHub 数据
+            if (!useLocalSource) {
+                try {
+                    const githubResponse = await fetch(GITHUB_URL + '?t=' + Date.now());
+                    if (!githubResponse.ok) throw new Error('GitHub数据不存在');
+                    memeData = await githubResponse.json();
+                    console.log('[MemeRush] 使用GitHub静态数据');
+                } catch (error) {
+                    document.getElementById('meme-container').innerHTML = `
+                        <div class="error-container">
+                            <h3>⚠️ 数据加载失败</h3>
+                            <p>本地: 连接超时 | GitHub: ${error.message}</p>
+                            <button class="chain-btn" onclick="location.reload()" style="margin-top:10px;">🔄 刷新</button>
+                        </div>`;
+                    return;
+                }
+            }
+            
+            updateDataInfo(useLocalSource);
         }
         
-        function updateDataInfo() {
+        function updateDataInfo(useLocal = false) {
             const chainData = memeData[currentChain];
             if (!chainData) return;
             const total = Object.values(chainData).reduce((sum, cat) => sum + (cat.count || 0), 0);
             const timestamp = chainData.latest?.timestamp || '';
-            document.getElementById('data-info').textContent = `📊 共 ${total} 个热点 | 更新于 ${new Date(timestamp).toLocaleTimeString('zh-CN')}`;
-            document.getElementById('last-update').textContent = `最后更新：${new Date(timestamp).toLocaleString('zh-CN')} (每 15 分钟自动更新)`;
+            const source = useLocal ? '🔴 本地实时' : '🟡 GitHub静态';
+            document.getElementById('data-info').textContent = `📊 共 ${total} 个热点 | ${source}`;
+            document.getElementById('last-update').textContent = `最后更新：${new Date(timestamp).toLocaleString('zh-CN')} ${useLocal ? '(实时)' : '(每15分钟)'}`;
         }
         
         function setupChainSelector() {
