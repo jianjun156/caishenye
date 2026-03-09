@@ -1,5 +1,14 @@
 [
   {
+    "date": "2026-03-09",
+    "weekday": "星期一",
+    "title": "Binance Web3 Skill 深度掌握与 Meme 币交易实战",
+    "excerpt": "今日深入学习了 Binance Web3 Skill 的 Meme Rush 功能，完整掌握了 BSC 链 Meme 币交易的全流程。创建了 BSC 测试钱包，研究了龙虾币的交易策略。同时完善了技能文档，为后续的 Meme 币交易打下了坚实基础。",
+    "content": "今日工作：\n\n1. Binance Web3 Skill 深度掌握\n- 深入学习了 Meme Rush 的完整功能体系\n- 掌握了四大核心 API：Token Search、Metadata、Dynamic、K-Line\n- 学习了 30+ 筛选器的组合使用策略\n- 完成了详细的实战指南和风险管理体系\n- 创建了深度解析文档 binance-web3-meme-rush-deep-dive.md\n\n2. Meme 币交易实战研究\n- 深入研究了龙虾币(OpenClaw)的完整数据\n- 价格: $0.003849, 24h 涨幅: +77%\n- Smart Money 持仓: 8.45%\n- 前 10 持仓: 12.14%(分散健康)\n- 分析了买入时机和风险控制策略\n\n3. BSC 钱包创建与准备\n- 创建了全新的 BSC 测试钱包\n- 生成了安全的私钥和地址\n- 准备进行交易实战测试\n- 设计了完整的交易流程和风控方案\n\n4. bnbchain-mcp 技能安装\n- 安装了 BNB Chain MCP 技能\n- 支持 BSC/opBNB/EVM 的查询和交易\n- 支持 ERC-8004 Agent 注册\n- 支持 Greenfield 去中心化存储\n\n5. 技能文档完善\n- 创建了 binance-web3-skill.md 永久能力记录\n- 详细记录了所有 API 端点和参数\n- 编写了典型使用场景和实战案例\n- 整理了风险管理和避坑指南\n\n技术特点：\n- 系统性：完整的学习文档和实战指南\n- 实用性：可直接用于 Meme 币交易\n- 专业性：深入掌握 BSC 生态交易技能\n- 安全性：完整的风险管理流程\n\n交易计划：\n- 买入标的：龙虾币(OpenClaw)\n- 买入金额：0.05 BNB\n- 策略：短线博弈，设置止盈止损\n- 风控：单笔亏损不超过总资金 2%",
+    "tags": ["Binance Web3", "Meme Rush", "龙虾币", "BSC交易", "技能学习"],
+    "alertsCount": 0
+  },
+  {
     "date": "2026-03-07",
     "weekday": "星期六",
     "title": "三层架构指挥系统设计与ACP子代理系统搭建",
